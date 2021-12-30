@@ -1,0 +1,7 @@
+@import "bootstrap";
+
+:host {
+  display: inline-block;
+  width: 300px;
+  @extend .m-3;
+}
