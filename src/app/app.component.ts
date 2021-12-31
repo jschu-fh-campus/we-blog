@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { switchMap, takeUntil, tap } from 'rxjs/operators';
+import { LoginFormService, Kunde } from './login-form.service';
 import { User } from './user';
 
 @Component({
@@ -8,47 +11,42 @@ import { User } from './user';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
-
-  ngOnInit(): void {
-  }
+export class AppComponent implements OnInit, OnDestroy {
 
   title = 'Login';
   form = new FormGroup({});
-  model: User = {};
+  fields: FormlyFieldConfig[];
+  model: User;
+  kunden = Kunde;
 
-  fields: FormlyFieldConfig[] = [
-    {
-      key: 'username',
-      type: 'input',
-      className: 'd-block mt-2',
-      templateOptions: {
-        label: 'Username',
-        required: true,
-      }
-    },
-    // {
-    //   key: 'email',
-    //   type: 'input',
-    //   className: 'd-block mt-2',
-    //   templateOptions: {
-    //     label: 'E-Mail',
-    //     required: true,
-    //   }
-    // },
-    {
-      key: 'password',
-      type: 'input',
-      className: 'd-block mt-2',
-      templateOptions: {
-        label: 'Passwort',
-        type: 'password',
-        required: true,
-      }
-    }
-  ];
+  private kunde$ = new BehaviorSubject(Kunde.kunde1);
+  private destroy$ = new Subject<boolean>();
+
+  constructor(private loginFormService: LoginFormService) {
+  }
+
+  ngOnInit(): void {
+    this.kunde$
+      .pipe(
+        switchMap((kunde) => this.loginFormService.getFields(kunde)),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(fields => {
+        this.model = {};
+        this.fields = fields;
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
+    this.destroy$.unsubscribe();
+  }
 
   login(model: User): void {
     console.log(model);
+  }
+
+  changeKunde(kunde: Kunde): void {
+    this.kunde$.next(kunde);
   }
 }

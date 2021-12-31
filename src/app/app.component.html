@@ -1,6 +1,15 @@
-<h1 class="mb-2">{{title}}</h1>
+<h1>{{title}}</h1>
+
+<div class="form-check mt-2">
+  <input class="form-check-input" type="radio" name="radioKunde" id="radioKunde1" (change)="changeKunde(kunden.kunde1)" checked>
+  <label class="form-check-label" for="radioKunde1">Kunde 1</label>
+</div>
+<div class="form-check">
+  <input class="form-check-input" type="radio" name="radioKunde" id="radioKunde2" (change)="changeKunde(kunden.kunde2)">
+  <label class="form-check-label" for="radioKunde2">Kunde 2</label>
+</div>
 
 <form [formGroup]="form" (ngSubmit)="login(model)">
   <formly-form [form]="form" [fields]="fields" [model]="model"></formly-form>
-  <button type="submit" class="btn btn-primary mt-3">Login</button>
+  <button type="submit" class="btn btn-primary mt-2">Login</button>
 </form>
